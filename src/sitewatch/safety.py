@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ipaddress
+import socket
 from urllib.parse import urlsplit, urlunsplit
 
 
@@ -66,3 +67,25 @@ def validate_http_url(value: str) -> str:
             "",
         )
     )
+
+
+def validate_public_resolution(url: str, *, resolver=socket.getaddrinfo) -> tuple[str, ...]:
+    """Resolve a validated target and reject any non-public destination address."""
+
+    parts = urlsplit(validate_http_url(url))
+    port = parts.port or (443 if parts.scheme == "https" else 80)
+    try:
+        records = resolver(parts.hostname, port, type=socket.SOCK_STREAM)
+    except OSError as exc:
+        raise SiteWatchError("target hostname could not be resolved") from exc
+    addresses = sorted({record[4][0] for record in records})
+    if not addresses:
+        raise SiteWatchError("target hostname did not resolve to an address")
+    for value in addresses:
+        try:
+            address = ipaddress.ip_address(value)
+        except ValueError as exc:
+            raise SiteWatchError("target resolved to an invalid address") from exc
+        if not address.is_global:
+            raise SiteWatchError("target resolved to a non-public IP address")
+    return tuple(addresses)
