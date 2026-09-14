@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "targets": [
+    {
+      "name": "example-homepage",
+      "url": "https://example.com/",
+      "expected_statuses": [200],
+      "timeout_seconds": 5,
+      "max_bytes": 100000,
+      "expected_content_type": "text/html",
+      "allow_redirects": false
+    }
+  ]
+}
