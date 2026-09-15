@@ -1,9 +1,9 @@
 # SiteWatch
 
 SiteWatch is a local-first command-line tool for running predictable, bounded
-website health checks.
+website health checks and detecting reviewed changes over time.
 
-The first release focuses on safe monitoring fundamentals:
+SiteWatch provides safe monitoring fundamentals:
 
 - validate strict, versioned JSON target configurations;
 - accept only explicit HTTP and HTTPS targets;
@@ -11,13 +11,15 @@ The first release focuses on safe monitoring fundamentals:
 - bound timeouts, response sizes, redirects, and target counts;
 - evaluate expected status codes and optional content-type rules;
 - calculate SHA-256 response fingerprints without storing response bodies;
-- produce deterministic text or JSON reports;
-- write reports atomically without replacing existing files;
-- distinguish healthy, unhealthy, and invalid runs through exit codes;
+- create strict, body-free baseline snapshots without overwriting files;
+- compare current results with a baseline by stable target name;
+- report changed, new, missing, and unchanged targets without old/new values;
+- produce deterministic text or JSON reports with optional URL redaction;
+- distinguish healthy, drifted, unhealthy, and invalid runs through exit codes;
 - require no account, API key, hosted service, or third-party dependency.
 
 SiteWatch is being built as part of an eight-week automation project challenge.
-Real monitoring targets should remain in private configuration files.
+Real monitoring targets and baselines should remain in private files.
 
 ## Quick start
 
@@ -25,20 +27,26 @@ Real monitoring targets should remain in private configuration files.
 python -m pip install -e .
 sitewatch validate examples/targets.json
 sitewatch check examples/targets.json --json
-sitewatch check examples/targets.json \
-  --json \
-  --redact-urls \
-  --output sitewatch-output.json
+
+sitewatch snapshot examples/targets.json --output sitewatch-baseline.json
+sitewatch validate-baseline sitewatch-baseline.json
+sitewatch compare examples/targets.json sitewatch-baseline.json \
+  --json --redact-urls
 ```
 
-Validation never makes a network request. Health checks resolve each destination,
-enforce configured bounds, and run sequentially. Exit status 0 means healthy, 1
-means attention is required, and 2 means invalid input or output.
+Configuration and baseline validation never make network requests. Health checks
+resolve each destination, enforce configured bounds, and run sequentially.
+Snapshot and report exports are atomic and non-overwriting.
 
-See the [usage guide](docs/usage.md) and
+Exit status 0 means the requested check is healthy and, for comparisons,
+unchanged. Status 1 means attention is required because health failed or drift
+was detected. Status 2 means invalid input or output.
+
+See the [usage guide](docs/usage.md),
+[baseline guide](docs/baselines.md), and
 [privacy and safety guide](docs/privacy-and-safety.md) before monitoring
 untrusted targets or sharing reports.
 
 ## Status
 
-SiteWatch 0.1.0 provides the first complete monitoring workflow.
+SiteWatch 0.2.0 adds strict baselines and privacy-aware change detection.
