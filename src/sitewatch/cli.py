@@ -8,8 +8,11 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
+from .baseline import baseline_from_run, format_baseline, load_baseline
 from .checks import run_checks
 from .config import load_config
+from .drift import compare_to_baseline
+from .drift_report import format_drift_run
 from .output import write_output
 from .report import format_check_run
 from .safety import SiteWatchError
@@ -30,15 +33,38 @@ def build_parser() -> argparse.ArgumentParser:
     validate.add_argument("config", type=Path)
     validate.add_argument("--json", action="store_true", dest="as_json")
 
-    check = commands.add_parser(
-        "check",
-        help="run configured health checks",
-    )
+    check = commands.add_parser("check", help="run configured health checks")
     check.add_argument("config", type=Path)
-    check.add_argument("--json", action="store_true", dest="as_json")
-    check.add_argument("--redact-urls", action="store_true")
-    check.add_argument("--output", type=Path)
+    _add_report_options(check)
+
+    snapshot = commands.add_parser(
+        "snapshot",
+        help="check targets and create a non-overwriting baseline",
+    )
+    snapshot.add_argument("config", type=Path)
+    snapshot.add_argument("--output", type=Path, required=True)
+
+    compare = commands.add_parser(
+        "compare",
+        help="check targets and compare them with a saved baseline",
+    )
+    compare.add_argument("config", type=Path)
+    compare.add_argument("baseline", type=Path)
+    _add_report_options(compare)
+
+    validate_baseline = commands.add_parser(
+        "validate-baseline",
+        help="validate a baseline without making network requests",
+    )
+    validate_baseline.add_argument("baseline", type=Path)
+    validate_baseline.add_argument("--json", action="store_true", dest="as_json")
     return parser
+
+
+def _add_report_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--json", action="store_true", dest="as_json")
+    parser.add_argument("--redact-urls", action="store_true")
+    parser.add_argument("--output", type=Path)
 
 
 def _validation_report(targets, *, as_json: bool) -> str:
@@ -56,25 +82,66 @@ def _validation_report(targets, *, as_json: bool) -> str:
     )
 
 
+def _baseline_validation_report(baseline, *, as_json: bool) -> str:
+    payload = {
+        "valid": True,
+        "targets": len(baseline.entries),
+        "names": [entry.name for entry in baseline.entries],
+    }
+    if as_json:
+        return json.dumps(payload, indent=2, sort_keys=True)
+    return (
+        "SiteWatch baseline is valid\n"
+        f"Targets: {len(baseline.entries)}\n"
+        "Names: " + ", ".join(payload["names"])
+    )
+
+
+def _emit_or_write(content: str, output: Path | None) -> None:
+    if output is None:
+        print(content, end="" if content.endswith("\n") else "\n")
+    else:
+        destination = write_output(output, content)
+        print(f"Wrote {destination.name}")
+
+
 def run(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.command == "validate-baseline":
+            baseline = load_baseline(args.baseline)
+            print(_baseline_validation_report(baseline, as_json=args.as_json))
+            return 0
+
         targets = load_config(args.config)
         if args.command == "validate":
             print(_validation_report(targets, as_json=args.as_json))
             return 0
 
         result = run_checks(targets)
+        if args.command == "snapshot":
+            destination = write_output(
+                args.output, format_baseline(baseline_from_run(result))
+            )
+            print(f"Wrote {destination.name}")
+            return 0 if result.healthy else 1
+
+        if args.command == "compare":
+            comparison = compare_to_baseline(result, load_baseline(args.baseline))
+            content = format_drift_run(
+                comparison,
+                as_json=args.as_json,
+                redact_urls=args.redact_urls,
+            )
+            _emit_or_write(content, args.output)
+            return 0 if comparison.current_healthy and not comparison.has_drift else 1
+
         content = format_check_run(
             result,
             as_json=args.as_json,
             redact_urls=args.redact_urls,
         )
-        if args.output is None:
-            print(content, end="" if content.endswith("\n") else "\n")
-        else:
-            destination = write_output(args.output, content)
-            print(f"Wrote {destination.name}")
+        _emit_or_write(content, args.output)
         return 0 if result.healthy else 1
     except SiteWatchError as exc:
         print(f"error: {exc}", file=sys.stderr)
