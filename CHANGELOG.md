@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.0 — 2026-09-15
+
+- Added strict, versioned baseline snapshots with bounded unique targets.
+- Added deterministic baseline serialization and local-only validation.
+- Added body-free snapshots containing stable health metadata and fingerprints.
+- Added value-free comparisons for changed, new, missing, and unchanged targets.
+- Excluded volatile duration, byte-count, and timestamp data from drift checks.
+- Added readable and JSON drift reports with optional URL redaction.
+- Added non-overwriting baseline creation and comparison report exports.
+- Added automation-friendly exit statuses for unhealthy or changed sites.
+- Added tests for schema validation, comparisons, privacy, CLI, and exports.
+- Documented baseline retention, disclosure boundaries, and reviewed updates.
+
 ## 0.1.0 — 2026-09-14
 
 - Added strict, versioned monitoring configurations with bounded target counts.
