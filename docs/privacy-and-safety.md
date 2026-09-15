@@ -40,5 +40,23 @@ Reports contain target names and URLs by default. Use `--redact-urls` when URLs
 should not appear. Target names, status codes, timing, content types, sizes, and
 fingerprints may also be sensitive, so review reports before sharing them.
 
+## Baseline privacy
+
+Baseline files contain target names, configured URLs, health states, statuses,
+content types, and SHA-256 response fingerprints. They never contain response
+bodies, durations, byte counts, final redirect URLs, or timestamps. Even without
+a body, a fingerprint reveals equality between observations and may disclose
+that content changed. Store baselines with the private configuration they
+describe.
+
+Comparison reports intentionally include changed field names rather than old
+and new values. Use `--redact-urls` to omit configured URLs before sharing a
+comparison. Target names and change patterns can still be sensitive. Redaction
+does not make a report anonymous.
+
+SiteWatch validates baselines without network access and never updates a trusted
+baseline in place. Snapshot and report exports are created atomically and do not
+replace existing files.
+
 SiteWatch does not encrypt, upload, notify, schedule itself, or verify report
 recipients.
