@@ -54,6 +54,28 @@ Exit status 0 means every target is healthy, 1 means at least one target is
 unhealthy or could not be checked, and 2 means the configuration or output
 request is invalid.
 
+## Track changes against a baseline
+
+```bash
+sitewatch snapshot ~/private/sitewatch-targets.json \
+  --output ~/private/sitewatch-baseline.json
+
+sitewatch validate-baseline ~/private/sitewatch-baseline.json
+
+sitewatch compare \
+  ~/private/sitewatch-targets.json \
+  ~/private/sitewatch-baseline.json \
+  --json --redact-urls
+```
+
+Snapshots retain body-free stable metadata and cannot replace an existing file.
+Comparisons identify changed, new, missing, and unchanged targets. They ignore
+volatile timing, byte-count, and timestamp data. A comparison exits 1 when the
+current run is unhealthy or any drift is found.
+
+See [baselines.md](baselines.md) for the strict schema, privacy model, and
+intentional-change workflow.
+
 ## Redact and export
 
 ```bash
