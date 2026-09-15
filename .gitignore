@@ -12,5 +12,9 @@ htmlcov/
 .env.*
 targets.json
 sitewatch-config.json
+sitewatch-baseline*.json
+baselines/
+snapshots/
 reports/
 sitewatch-output.*
+sitewatch-changes.*
