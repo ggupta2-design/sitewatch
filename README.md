@@ -14,6 +14,8 @@ SiteWatch provides safe monitoring fundamentals:
 - create strict, body-free baseline snapshots without overwriting files;
 - compare current results with a baseline by stable target name;
 - report changed, new, missing, and unchanged targets without old/new values;
+- discover and check bounded same-origin links from public HTML pages;
+- opt in to external link checks while preserving destination safeguards;
 - produce deterministic text or JSON reports with optional URL redaction;
 - distinguish healthy, drifted, unhealthy, and invalid runs through exit codes;
 - require no account, API key, hosted service, or third-party dependency.
@@ -32,6 +34,8 @@ sitewatch snapshot examples/targets.json --output sitewatch-baseline.json
 sitewatch validate-baseline sitewatch-baseline.json
 sitewatch compare examples/targets.json sitewatch-baseline.json \
   --json --redact-urls
+
+sitewatch links https://example.com/ --max-links 25 --redact-urls
 ```
 
 Configuration and baseline validation never make network requests. Health checks
@@ -43,10 +47,11 @@ unchanged. Status 1 means attention is required because health failed or drift
 was detected. Status 2 means invalid input or output.
 
 See the [usage guide](docs/usage.md),
-[baseline guide](docs/baselines.md), and
+[baseline guide](docs/baselines.md),
+[link-audit guide](docs/link-audits.md), and
 [privacy and safety guide](docs/privacy-and-safety.md) before monitoring
 untrusted targets or sharing reports.
 
 ## Status
 
-SiteWatch 0.2.0 adds strict baselines and privacy-aware change detection.
+SiteWatch 0.3.0 adds bounded, privacy-aware broken-link audits.
