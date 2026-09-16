@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sitewatch"
-version = "0.2.0"
-description = "Safe, bounded website health checks and change detection"
+version = "0.3.0"
+description = "Safe website health, change, and broken-link monitoring"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
