@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 — 2026-09-16
+
+- Added bounded link discovery for one public HTML source page.
+- Added same-origin auditing by default with explicit external-link opt in.
+- Added relative-link resolution, fragment removal, and destination deduplication.
+- Added explicit source-byte, link-count, and request-timeout limits.
+- Added public URL, DNS, and redirect validation for every destination.
+- Added sequential destination checks that never read response bodies.
+- Added healthy, broken, and stable transport-error classifications.
+- Added readable and JSON link reports with full URL redaction.
+- Added atomic non-overwriting link report exports and automation exit statuses.
+- Added tests for discovery, limits, transport, privacy, reporting, and CLI flows.
+- Documented network side effects, scope limits, and interpretation boundaries.
+
 ## 0.2.0 — 2026-09-15
 
 - Added strict, versioned baseline snapshots with bounded unique targets.
