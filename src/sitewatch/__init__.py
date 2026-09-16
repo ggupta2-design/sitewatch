@@ -14,6 +14,18 @@ from .config import config_from_dict, load_config, target_from_dict
 from .drift import DriftResult, DriftRun, DriftState, compare_to_baseline
 from .drift_report import drift_run_to_dict, format_drift_run
 from .http import observe_target
+from .link_http import check_link_destination, fetch_html_page
+from .link_report import format_link_audit, link_audit_to_dict
+from .links import (
+    HtmlPage,
+    LinkAudit,
+    LinkAuditPolicy,
+    LinkDiscovery,
+    LinkResult,
+    LinkState,
+    audit_links,
+    discover_links,
+)
 from .models import CheckResult, CheckState, Observation, Target
 from .output import write_output
 from .report import check_run_to_dict, format_check_run
@@ -23,7 +35,7 @@ from .safety import (
     validate_public_resolution,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "Baseline",
@@ -34,20 +46,32 @@ __all__ = [
     "DriftResult",
     "DriftRun",
     "DriftState",
+    "HtmlPage",
+    "LinkAudit",
+    "LinkAuditPolicy",
+    "LinkDiscovery",
+    "LinkResult",
+    "LinkState",
     "Observation",
     "SiteWatchError",
     "Target",
     "baseline_from_dict",
     "baseline_from_run",
     "baseline_to_dict",
+    "audit_links",
+    "check_link_destination",
     "check_run_to_dict",
     "compare_to_baseline",
     "config_from_dict",
+    "discover_links",
     "drift_run_to_dict",
     "evaluate_observation",
+    "fetch_html_page",
     "format_baseline",
     "format_check_run",
     "format_drift_run",
+    "format_link_audit",
+    "link_audit_to_dict",
     "load_baseline",
     "load_config",
     "observe_target",
