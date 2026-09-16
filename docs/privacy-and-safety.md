@@ -58,5 +58,24 @@ SiteWatch validates baselines without network access and never updates a trusted
 baseline in place. Snapshot and report exports are created atomically and do not
 replace existing files.
 
+## Link-audit safety and privacy
+
+Link audits default to the source page's origin and require explicit
+`--include-external` permission before requesting external destinations. Both
+source and destination URLs receive the same credential, local-address, public
+DNS, timeout, and redirect protections as health checks. Discovery and checks
+are bounded and sequential; link audits do not crawl recursively.
+
+The bounded source HTML exists only long enough to extract links. It is not
+stored in audit objects or reports. Destination response bodies are never read.
+Reports contain URLs by default, along with statuses, timings, and error codes.
+Use `--redact-urls` before sharing, while remembering that counts and status
+patterns can still disclose information about a site.
+
+Link checking sends network requests to every in-scope destination. This can
+appear in server logs and may trigger rate limits or security controls. Keep
+limits conservative, respect site policies, and run untrusted audits from an
+appropriately restricted environment.
+
 SiteWatch does not encrypt, upload, notify, schedule itself, or verify report
 recipients.
