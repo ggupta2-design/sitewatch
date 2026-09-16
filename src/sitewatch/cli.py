@@ -13,6 +13,9 @@ from .checks import run_checks
 from .config import load_config
 from .drift import compare_to_baseline
 from .drift_report import format_drift_run
+from .link_http import check_link_destination, fetch_html_page
+from .link_report import format_link_audit
+from .links import LinkAuditPolicy, audit_links
 from .output import write_output
 from .report import format_check_run
 from .safety import SiteWatchError
@@ -58,6 +61,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     validate_baseline.add_argument("baseline", type=Path)
     validate_baseline.add_argument("--json", action="store_true", dest="as_json")
+
+    links = commands.add_parser(
+        "links",
+        help="discover and check bounded links from one public HTML page",
+    )
+    links.add_argument("url")
+    links.add_argument("--max-links", type=int, default=50)
+    links.add_argument("--max-page-bytes", type=int, default=1_000_000)
+    links.add_argument("--timeout-seconds", type=float, default=10.0)
+    links.add_argument("--include-external", action="store_true")
+    _add_report_options(links)
     return parser
 
 
@@ -112,6 +126,27 @@ def run(argv: Sequence[str] | None = None) -> int:
             baseline = load_baseline(args.baseline)
             print(_baseline_validation_report(baseline, as_json=args.as_json))
             return 0
+
+        if args.command == "links":
+            policy = LinkAuditPolicy(
+                source_url=args.url,
+                max_links=args.max_links,
+                max_page_bytes=args.max_page_bytes,
+                timeout_seconds=args.timeout_seconds,
+                include_external=args.include_external,
+            )
+            audit = audit_links(
+                policy,
+                fetch_page=fetch_html_page,
+                check_link=check_link_destination,
+            )
+            content = format_link_audit(
+                audit,
+                as_json=args.as_json,
+                redact_urls=args.redact_urls,
+            )
+            _emit_or_write(content, args.output)
+            return 0 if audit.healthy else 1
 
         targets = load_config(args.config)
         if args.command == "validate":
