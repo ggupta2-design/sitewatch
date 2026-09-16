@@ -76,6 +76,29 @@ current run is unhealthy or any drift is found.
 See [baselines.md](baselines.md) for the strict schema, privacy model, and
 intentional-change workflow.
 
+## Audit links on a public page
+
+```bash
+sitewatch links https://example.com/docs/ \
+  --max-links 50 \
+  --max-page-bytes 1000000 \
+  --timeout-seconds 10
+
+sitewatch links https://example.com/docs/ \
+  --json --redact-urls \
+  --output ~/private/reports/links.json
+```
+
+Link audits are same-origin by default. Use `--include-external` only when
+external requests are intended. SiteWatch resolves relative links, removes
+fragments, deduplicates destinations, and checks them sequentially. Source-page
+content is bounded and discarded after parsing; destination bodies are not read.
+
+Status 0 means every checked link is healthy. Status 1 covers a source error,
+empty audit, broken link, or destination error. Status 2 covers invalid options,
+URLs, or output. See [link-audits.md](link-audits.md) for limits, privacy, and
+interpretation guidance.
+
 ## Redact and export
 
 ```bash
