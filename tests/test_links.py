@@ -12,10 +12,10 @@ from sitewatch.safety import SiteWatchError
 
 
 def policy(**changes):
-    return LinkAuditPolicy(
-        source_url="https://example.com/docs/index.html",
-        **changes,
+    source_url = changes.pop(
+        "source_url", "https://example.com/docs/index.html"
     )
+    return LinkAuditPolicy(source_url=source_url, **changes)
 
 
 def healthy(url, selected):
