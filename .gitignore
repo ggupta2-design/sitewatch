@@ -15,6 +15,9 @@ sitewatch-config.json
 sitewatch-baseline*.json
 baselines/
 snapshots/
+history/
+histories/
+sitewatch-history*.json
 reports/
 sitewatch-output.*
 sitewatch-changes.*
