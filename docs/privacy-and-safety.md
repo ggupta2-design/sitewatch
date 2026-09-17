@@ -77,5 +77,24 @@ appear in server logs and may trigger rate limits or security controls. Keep
 limits conservative, respect site policies, and run untrusted audits from an
 appropriately restricted environment.
 
+## History privacy and retention
+
+Availability histories omit URLs, final destinations, fingerprints, content
+types, response sizes, findings, and response bodies. They retain target names,
+timestamps, health states, HTTP statuses, durations, and stable error codes.
+That metadata can still disclose service names, incident periods, performance
+patterns, and monitoring schedules. Keep history files private and review
+summaries before sharing.
+
+History files are bounded to 10,000 samples. Append operations create a new file
+and never change their input, supporting review and rollback without silent
+mutation. SiteWatch does not delete old versions, encrypt histories, enforce a
+retention period, or verify access permissions; those responsibilities remain
+with the operator.
+
+Availability percentages describe recorded samples only. Sparse or irregular
+checks do not establish continuous uptime, and summaries should not be treated
+as contractual service-level evidence.
+
 SiteWatch does not encrypt, upload, notify, schedule itself, or verify report
 recipients.
