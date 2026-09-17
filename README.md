@@ -16,6 +16,8 @@ SiteWatch provides safe monitoring fundamentals:
 - report changed, new, missing, and unchanged targets without old/new values;
 - discover and check bounded same-origin links from public HTML pages;
 - opt in to external link checks while preserving destination safeguards;
+- create immutable, bounded availability histories without URLs or bodies;
+- summarize reliability goals and latency across recorded health samples;
 - produce deterministic text or JSON reports with optional URL redaction;
 - distinguish healthy, drifted, unhealthy, and invalid runs through exit codes;
 - require no account, API key, hosted service, or third-party dependency.
@@ -36,6 +38,9 @@ sitewatch compare examples/targets.json sitewatch-baseline.json \
   --json --redact-urls
 
 sitewatch links https://example.com/ --max-links 25 --redact-urls
+
+sitewatch history-create examples/targets.json --output history-001.json
+sitewatch availability history-001.json --minimum-availability 99
 ```
 
 Configuration and baseline validation never make network requests. Health checks
@@ -48,10 +53,11 @@ was detected. Status 2 means invalid input or output.
 
 See the [usage guide](docs/usage.md),
 [baseline guide](docs/baselines.md),
-[link-audit guide](docs/link-audits.md), and
+[link-audit guide](docs/link-audits.md),
+[availability-history guide](docs/history.md), and
 [privacy and safety guide](docs/privacy-and-safety.md) before monitoring
 untrusted targets or sharing reports.
 
 ## Status
 
-SiteWatch 0.3.0 adds bounded, privacy-aware broken-link audits.
+SiteWatch 0.4.0 adds immutable availability history and reliability summaries.
