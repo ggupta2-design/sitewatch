@@ -99,6 +99,35 @@ empty audit, broken link, or destination error. Status 2 covers invalid options,
 URLs, or output. See [link-audits.md](link-audits.md) for limits, privacy, and
 interpretation guidance.
 
+## Build availability history
+
+```bash
+sitewatch history-create ~/private/sitewatch-targets.json \
+  --output ~/private/history/sitewatch-001.json
+
+sitewatch history-append \
+  ~/private/sitewatch-targets.json \
+  ~/private/history/sitewatch-001.json \
+  --output ~/private/history/sitewatch-002.json
+
+sitewatch history-validate ~/private/history/sitewatch-002.json
+
+sitewatch availability ~/private/history/sitewatch-002.json \
+  --minimum-availability 99 \
+  --json
+```
+
+History files contain bounded state, status, latency, error-code, name, and UTC
+timestamp metadata. They omit URLs, fingerprints, content types, sizes, and
+response bodies. Appending always writes a new file and requires strictly later
+samples.
+
+Availability reports aggregate healthy, unhealthy, and error counts plus
+latency and observation windows. Status 0 means every target meets the selected
+goal; status 1 means at least one does not; status 2 means an input or output is
+invalid. See [history.md](history.md) for schema, retention, and interpretation
+guidance.
+
 ## Redact and export
 
 ```bash
