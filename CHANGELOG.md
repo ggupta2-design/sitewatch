@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.0 — 2026-09-17
+
+- Added strict, versioned availability histories capped at 10,000 samples.
+- Added URL-free samples containing state, status, duration, time, and error code.
+- Added immutable append workflows that always create a new history file.
+- Added chronological and duplicate-sample safeguards for history extensions.
+- Added local history validation that performs no network requests.
+- Added per-target healthy, unhealthy, error, and availability metrics.
+- Added average and maximum latency plus recorded observation windows.
+- Added configurable availability goals with automation-friendly exit statuses.
+- Added readable and JSON summaries without URLs, fingerprints, or bodies.
+- Added atomic non-overwriting exports for histories and reliability reports.
+- Added tests for schemas, privacy, appends, metrics, goals, reports, and CLI.
+- Documented retention, privacy, and non-contractual interpretation boundaries.
+
 ## 0.3.0 — 2026-09-16
 
 - Added bounded link discovery for one public HTML source page.
