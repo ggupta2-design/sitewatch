@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
+from .availability import summarize_availability
+from .availability_report import format_availability_summary
 from .baseline import baseline_from_run, format_baseline, load_baseline
 from .checks import run_checks
 from .config import load_config
@@ -16,6 +18,12 @@ from .drift_report import format_drift_run
 from .link_http import check_link_destination, fetch_html_page
 from .link_report import format_link_audit
 from .links import LinkAuditPolicy, audit_links
+from .history import (
+    append_history,
+    format_history,
+    history_from_run,
+    load_history,
+)
 from .output import write_output
 from .report import format_check_run
 from .safety import SiteWatchError
@@ -72,6 +80,39 @@ def build_parser() -> argparse.ArgumentParser:
     links.add_argument("--timeout-seconds", type=float, default=10.0)
     links.add_argument("--include-external", action="store_true")
     _add_report_options(links)
+
+    history_create = commands.add_parser(
+        "history-create",
+        help="check targets and create a new bounded history file",
+    )
+    history_create.add_argument("config", type=Path)
+    history_create.add_argument("--output", type=Path, required=True)
+
+    history_append = commands.add_parser(
+        "history-append",
+        help="check targets and write a new history from an existing history",
+    )
+    history_append.add_argument("config", type=Path)
+    history_append.add_argument("history", type=Path)
+    history_append.add_argument("--output", type=Path, required=True)
+
+    history_validate = commands.add_parser(
+        "history-validate",
+        help="validate history without making network requests",
+    )
+    history_validate.add_argument("history", type=Path)
+    history_validate.add_argument("--json", action="store_true", dest="as_json")
+
+    availability = commands.add_parser(
+        "availability",
+        help="summarize bounded history without network requests",
+    )
+    availability.add_argument("history", type=Path)
+    availability.add_argument(
+        "--minimum-availability", type=float, default=99.0
+    )
+    availability.add_argument("--json", action="store_true", dest="as_json")
+    availability.add_argument("--output", type=Path)
     return parser
 
 
@@ -111,6 +152,24 @@ def _baseline_validation_report(baseline, *, as_json: bool) -> str:
     )
 
 
+def _history_validation_report(history, *, as_json: bool) -> str:
+    names = sorted({sample.name for sample in history.samples}, key=str.casefold)
+    payload = {
+        "valid": True,
+        "samples": len(history.samples),
+        "targets": len(names),
+        "names": names,
+    }
+    if as_json:
+        return json.dumps(payload, indent=2, sort_keys=True)
+    return (
+        "SiteWatch history is valid\n"
+        f"Samples: {len(history.samples)}\n"
+        f"Targets: {len(names)}\n"
+        "Names: " + ", ".join(names)
+    )
+
+
 def _emit_or_write(content: str, output: Path | None) -> None:
     if output is None:
         print(content, end="" if content.endswith("\n") else "\n")
@@ -126,6 +185,23 @@ def run(argv: Sequence[str] | None = None) -> int:
             baseline = load_baseline(args.baseline)
             print(_baseline_validation_report(baseline, as_json=args.as_json))
             return 0
+
+        if args.command == "history-validate":
+            history = load_history(args.history)
+            print(_history_validation_report(history, as_json=args.as_json))
+            return 0
+
+        if args.command == "availability":
+            summary = summarize_availability(
+                load_history(args.history),
+                minimum_availability=args.minimum_availability,
+            )
+            content = format_availability_summary(
+                summary,
+                as_json=args.as_json,
+            )
+            _emit_or_write(content, args.output)
+            return 0 if summary.meets_goal else 1
 
         if args.command == "links":
             policy = LinkAuditPolicy(
@@ -154,6 +230,19 @@ def run(argv: Sequence[str] | None = None) -> int:
             return 0
 
         result = run_checks(targets)
+        if args.command == "history-create":
+            destination = write_output(
+                args.output, format_history(history_from_run(result))
+            )
+            print(f"Wrote {destination.name}")
+            return 0 if result.healthy else 1
+
+        if args.command == "history-append":
+            history = append_history(load_history(args.history), result)
+            destination = write_output(args.output, format_history(history))
+            print(f"Wrote {destination.name}")
+            return 0 if result.healthy else 1
+
         if args.command == "snapshot":
             destination = write_output(
                 args.output, format_baseline(baseline_from_run(result))
