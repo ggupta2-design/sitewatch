@@ -128,6 +128,26 @@ goal; status 1 means at least one does not; status 2 means an input or output is
 invalid. See [history.md](history.md) for schema, retention, and interpretation
 guidance.
 
+## Review incidents and monitoring gaps
+
+```bash
+sitewatch incidents ~/private/history/sitewatch-002.json \
+  --maximum-gap-seconds 900
+
+sitewatch incidents ~/private/history/sitewatch-002.json \
+  --json --fail-on-any-incident
+```
+
+Incident analysis is local and read-only. Consecutive unhealthy and error
+samples become an incident until a later healthy sample records recovery.
+Per-target intervals larger than the selected bound are reported as monitoring
+gaps, preventing sparse evidence from being presented as continuous monitoring.
+
+By default, status 1 indicates an open incident or monitoring gap. The optional
+strict policy also returns 1 for fully recovered historical incidents. Reports
+omit URLs, statuses, error details, fingerprints, and response content. See
+[incidents.md](incidents.md) for definitions and interpretation limits.
+
 ## Redact and export
 
 ```bash
