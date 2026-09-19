@@ -98,3 +98,23 @@ def test_incident_command_rejects_invalid_gap_limit(tmp_path, capsys):
         ["incidents", str(history), "--maximum-gap-seconds", "0"]
     ) == 2
     assert "maximum_gap_seconds" in capsys.readouterr().err
+
+
+def test_strict_exit_policy_signals_recovered_history(tmp_path, capsys):
+    history = write_history(
+        tmp_path,
+        [
+            item("2026-09-18T00:00:00Z", "unhealthy"),
+            item("2026-09-18T00:05:00Z", "healthy"),
+        ],
+    )
+
+    assert run(["incidents", str(history), "--json"]) == 0
+    capsys.readouterr()
+
+    assert run(
+        ["incidents", str(history), "--json", "--fail-on-any-incident"]
+    ) == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["attention_required"] is False
+    assert payload["summary"]["incidents"] == 1
