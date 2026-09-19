@@ -123,6 +123,7 @@ def build_parser() -> argparse.ArgumentParser:
     incidents.add_argument("history", type=Path)
     incidents.add_argument("--maximum-gap-seconds", type=int, default=3600)
     incidents.add_argument("--json", action="store_true", dest="as_json")
+    incidents.add_argument("--fail-on-any-incident", action="store_true")
     incidents.add_argument("--output", type=Path)
     return parser
 
@@ -212,7 +213,8 @@ def run(argv: Sequence[str] | None = None) -> int:
                 as_json=args.as_json,
             )
             _emit_or_write(content, args.output)
-            return 1 if analysis.attention_required else 0
+            strict_failure = args.fail_on_any_incident and analysis.incident_count > 0
+            return 1 if analysis.attention_required or strict_failure else 0
 
         if args.command == "availability":
             summary = summarize_availability(
