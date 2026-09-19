@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 — 2026-09-19
+
+- Added read-only incident timelines from bounded availability histories.
+- Grouped consecutive unhealthy and error observations by stable target name.
+- Recorded recovery only when a later healthy observation is present.
+- Distinguished recovered incidents from incidents still open in the history.
+- Added affected, unhealthy, error, latency, and observed-span metrics.
+- Added per-target monitoring-gap detection with a strict configurable bound.
+- Added readable and JSON reports without URLs, statuses, or error-code values.
+- Added local-only incident analysis that never performs network requests.
+- Added default and strict automation exit policies for incident reviews.
+- Added atomic non-overwriting exports for incident analysis reports.
+- Added tests for recovery boundaries, gaps, privacy, CLI, and exit statuses.
+- Documented evidence limits, operational privacy, and safe interpretation.
+
 ## 0.4.0 — 2026-09-17
 
 - Added strict, versioned availability histories capped at 10,000 samples.
