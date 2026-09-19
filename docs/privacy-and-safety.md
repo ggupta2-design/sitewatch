@@ -96,5 +96,21 @@ Availability percentages describe recorded samples only. Sparse or irregular
 checks do not establish continuous uptime, and summaries should not be treated
 as contractual service-level evidence.
 
+## Incident-analysis privacy and interpretation
+
+Incident analysis runs locally against an existing history and makes no network
+requests. Reports omit URLs, HTTP statuses, error-code values, fingerprints,
+content types, response sizes, findings, and bodies. They retain target names,
+timestamps, affected-sample counts, latency maxima, recovery observations, and
+monitoring gaps. Those aggregates can still reveal operational schedules and
+service disruptions, so review reports before sharing them.
+
+An incident covers observed consecutive non-healthy samples. Its recovery time
+is the next healthy observation, not the exact recovery moment. An open incident
+means only that the supplied history contains no later healthy observation.
+Monitoring gaps identify insufficient observation density; they do not imply
+either uptime or downtime. SiteWatch does not infer continuous service state
+between samples, notify responders, or modify the source history.
+
 SiteWatch does not encrypt, upload, notify, schedule itself, or verify report
 recipients.
