@@ -18,6 +18,8 @@ from .drift_report import format_drift_run
 from .link_http import check_link_destination, fetch_html_page
 from .link_report import format_link_audit
 from .links import LinkAuditPolicy, audit_links
+from .incident_report import format_incident_analysis
+from .incidents import analyze_incidents
 from .history import (
     append_history,
     format_history,
@@ -113,6 +115,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     availability.add_argument("--json", action="store_true", dest="as_json")
     availability.add_argument("--output", type=Path)
+
+    incidents = commands.add_parser(
+        "incidents",
+        help="analyze incidents and monitoring gaps without network requests",
+    )
+    incidents.add_argument("history", type=Path)
+    incidents.add_argument("--maximum-gap-seconds", type=int, default=3600)
+    incidents.add_argument("--json", action="store_true", dest="as_json")
+    incidents.add_argument("--output", type=Path)
     return parser
 
 
@@ -190,6 +201,18 @@ def run(argv: Sequence[str] | None = None) -> int:
             history = load_history(args.history)
             print(_history_validation_report(history, as_json=args.as_json))
             return 0
+
+        if args.command == "incidents":
+            analysis = analyze_incidents(
+                load_history(args.history),
+                maximum_gap_seconds=args.maximum_gap_seconds,
+            )
+            content = format_incident_analysis(
+                analysis,
+                as_json=args.as_json,
+            )
+            _emit_or_write(content, args.output)
+            return 1 if analysis.attention_required else 0
 
         if args.command == "availability":
             summary = summarize_availability(
