@@ -106,3 +106,49 @@ def test_healthy_history_has_no_incidents():
     assert analysis.incident_count == 0
     assert analysis.recovered_count == 0
     assert analysis.healthy
+
+
+def test_monitoring_gaps_use_per_target_adjacent_samples():
+    history = AvailabilityHistory(
+        (
+            sample("API", 0, CheckState.HEALTHY),
+            sample("Web", 1, CheckState.HEALTHY),
+            sample("API", 70, CheckState.HEALTHY),
+            sample("Web", 30, CheckState.HEALTHY),
+        )
+    )
+
+    analysis = analyze_incidents(history, maximum_gap_seconds=3600)
+
+    assert analysis.gap_count == 1
+    gap = analysis.gaps[0]
+    assert gap.name == "API"
+    assert gap.previous_checked_at == START
+    assert gap.next_checked_at == START + timedelta(minutes=70)
+    assert gap.seconds == 4200
+    assert analysis.attention_required
+    assert not analysis.healthy
+
+
+def test_gap_equal_to_limit_is_not_flagged():
+    history = AvailabilityHistory(
+        (
+            sample("API", 0, CheckState.HEALTHY),
+            sample("API", 60, CheckState.HEALTHY),
+        )
+    )
+
+    analysis = analyze_incidents(history, maximum_gap_seconds=3600)
+
+    assert analysis.gaps == ()
+    assert analysis.healthy
+
+
+def test_gap_threshold_has_strict_bounds():
+    import pytest
+
+    history = AvailabilityHistory((sample("API", 0, CheckState.HEALTHY),))
+
+    for invalid in (True, 0, -1, 31_536_001, 1.5, "3600"):
+        with pytest.raises(ValueError, match="maximum_gap_seconds"):
+            analyze_incidents(history, maximum_gap_seconds=invalid)
