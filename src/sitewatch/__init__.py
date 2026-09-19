@@ -34,6 +34,14 @@ from .history import (
     load_history,
 )
 from .http import observe_target
+from .incident_report import format_incident_analysis, incident_analysis_to_dict
+from .incidents import (
+    MAXIMUM_GAP_SECONDS,
+    IncidentAnalysis,
+    IncidentRecord,
+    MonitoringGap,
+    analyze_incidents,
+)
 from .link_http import check_link_destination, fetch_html_page
 from .link_report import format_link_audit, link_audit_to_dict
 from .links import (
@@ -55,7 +63,7 @@ from .safety import (
     validate_public_resolution,
 )
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "AvailabilityHistory",
@@ -69,17 +77,22 @@ __all__ = [
     "DriftRun",
     "DriftState",
     "HistorySample",
+    "IncidentAnalysis",
+    "IncidentRecord",
     "HtmlPage",
     "LinkAudit",
     "LinkAuditPolicy",
     "LinkDiscovery",
     "LinkResult",
     "LinkState",
+    "MAXIMUM_GAP_SECONDS",
     "MAX_HISTORY_SAMPLES",
+    "MonitoringGap",
     "Observation",
     "SiteWatchError",
     "TargetAvailability",
     "Target",
+    "analyze_incidents",
     "append_history",
     "availability_summary_to_dict",
     "baseline_from_dict",
@@ -100,9 +113,11 @@ __all__ = [
     "format_drift_run",
     "format_link_audit",
     "format_history",
+    "format_incident_analysis",
     "history_from_dict",
     "history_from_run",
     "history_to_dict",
+    "incident_analysis_to_dict",
     "link_audit_to_dict",
     "load_baseline",
     "load_config",
