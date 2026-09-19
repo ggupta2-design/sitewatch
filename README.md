@@ -18,6 +18,7 @@ SiteWatch provides safe monitoring fundamentals:
 - opt in to external link checks while preserving destination safeguards;
 - create immutable, bounded availability histories without URLs or bodies;
 - summarize reliability goals and latency across recorded health samples;
+- reconstruct observed incident timelines, recoveries, and monitoring gaps;
 - produce deterministic text or JSON reports with optional URL redaction;
 - distinguish healthy, drifted, unhealthy, and invalid runs through exit codes;
 - require no account, API key, hosted service, or third-party dependency.
@@ -41,6 +42,7 @@ sitewatch links https://example.com/ --max-links 25 --redact-urls
 
 sitewatch history-create examples/targets.json --output history-001.json
 sitewatch availability history-001.json --minimum-availability 99
+sitewatch incidents history-001.json --maximum-gap-seconds 900
 ```
 
 Configuration and baseline validation never make network requests. Health checks
@@ -54,10 +56,11 @@ was detected. Status 2 means invalid input or output.
 See the [usage guide](docs/usage.md),
 [baseline guide](docs/baselines.md),
 [link-audit guide](docs/link-audits.md),
-[availability-history guide](docs/history.md), and
+[availability-history guide](docs/history.md),
+[incident-analysis guide](docs/incidents.md), and
 [privacy and safety guide](docs/privacy-and-safety.md) before monitoring
 untrusted targets or sharing reports.
 
 ## Status
 
-SiteWatch 0.4.0 adds immutable availability history and reliability summaries.
+SiteWatch 0.5.0 adds read-only incident timelines, recovery insights, and monitoring-gap detection.
