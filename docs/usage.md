@@ -148,6 +148,28 @@ strict policy also returns 1 for fully recovered historical incidents. Reports
 omit URLs, statuses, error details, fingerprints, and response content. See
 [incidents.md](incidents.md) for definitions and interpretation limits.
 
+## Apply a reliability policy
+
+```bash
+sitewatch policy-validate ~/private/sitewatch-policy.json
+
+sitewatch policy-check \
+  ~/private/history/sitewatch-002.json \
+  ~/private/sitewatch-policy.json \
+  --json
+```
+
+Policy validation and evaluation are local-only. A strict versioned policy sets
+minimum per-target availability and maximum open-incident, monitoring-gap, and
+error counts. The selected maximum gap also defines acceptable monitoring
+cadence.
+
+Status 0 means all four aggregate checks passed. Status 1 is a
+notification-ready alert decision, and status 2 indicates invalid input or
+output. Decision reports omit target names and observation details. See
+[reliability-policies.md](reliability-policies.md) for the schema, stable finding
+codes, and interpretation limits.
+
 ## Redact and export
 
 ```bash
