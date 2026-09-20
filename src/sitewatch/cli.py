@@ -27,6 +27,7 @@ from .history import (
     load_history,
 )
 from .output import write_output
+from .reliability_policy import load_policy, policy_to_dict
 from .report import format_check_run
 from .safety import SiteWatchError
 
@@ -125,6 +126,13 @@ def build_parser() -> argparse.ArgumentParser:
     incidents.add_argument("--json", action="store_true", dest="as_json")
     incidents.add_argument("--fail-on-any-incident", action="store_true")
     incidents.add_argument("--output", type=Path)
+
+    policy_validate = commands.add_parser(
+        "policy-validate",
+        help="validate a reliability policy without network requests",
+    )
+    policy_validate.add_argument("policy", type=Path)
+    policy_validate.add_argument("--json", action="store_true", dest="as_json")
     return parser
 
 
@@ -182,6 +190,21 @@ def _history_validation_report(history, *, as_json: bool) -> str:
     )
 
 
+
+def _policy_validation_report(policy, *, as_json: bool) -> str:
+    payload = {"valid": True, **policy_to_dict(policy)}
+    if as_json:
+        return json.dumps(payload, indent=2, sort_keys=True)
+    return (
+        "SiteWatch reliability policy is valid\n"
+        f"Name: {policy.name}\n"
+        f"Minimum availability: {policy.minimum_availability:g}%\n"
+        f"Maximum open incidents: {policy.maximum_open_incidents}\n"
+        f"Maximum monitoring gaps: {policy.maximum_monitoring_gaps}\n"
+        f"Maximum errors: {policy.maximum_errors}\n"
+        f"Maximum gap: {policy.maximum_gap_seconds} seconds"
+    )
+
 def _emit_or_write(content: str, output: Path | None) -> None:
     if output is None:
         print(content, end="" if content.endswith("\n") else "\n")
@@ -193,6 +216,11 @@ def _emit_or_write(content: str, output: Path | None) -> None:
 def run(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.command == "policy-validate":
+            policy = load_policy(args.policy)
+            print(_policy_validation_report(policy, as_json=args.as_json))
+            return 0
+
         if args.command == "validate-baseline":
             baseline = load_baseline(args.baseline)
             print(_baseline_validation_report(baseline, as_json=args.as_json))
