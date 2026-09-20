@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.6.0 — 2026-09-20
+
+- Added strict, named, schema-versioned reliability policies.
+- Added bounded thresholds for availability, incidents, gaps, and errors.
+- Added local-only policy validation without DNS or HTTP requests.
+- Evaluated minimum availability using the least-reliable target.
+- Added stable checks for open incidents, monitoring gaps, and error samples.
+- Added deterministic notification-ready alert decisions and finding codes.
+- Added readable and JSON reports containing aggregate evidence only.
+- Omitted target names, URLs, timestamps, statuses, error details, and bodies.
+- Added atomic non-overwriting decision report exports.
+- Added automation-friendly clear, alert, and invalid exit statuses.
+- Added a conservative public policy example and private-file exclusions.
+- Added tests for schemas, evaluation, privacy, CLI, exports, and status codes.
+- Documented policy workflows, evidence limits, and notification boundaries.
+
 ## 0.5.0 — 2026-09-19
 
 - Added read-only incident timelines from bounded availability histories.
