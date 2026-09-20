@@ -27,7 +27,9 @@ from .history import (
     load_history,
 )
 from .output import write_output
+from .reliability import evaluate_reliability
 from .reliability_policy import load_policy, policy_to_dict
+from .reliability_report import format_alert_decision
 from .report import format_check_run
 from .safety import SiteWatchError
 
@@ -133,6 +135,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     policy_validate.add_argument("policy", type=Path)
     policy_validate.add_argument("--json", action="store_true", dest="as_json")
+
+    policy_check = commands.add_parser(
+        "policy-check",
+        help="evaluate history against a local reliability policy",
+    )
+    policy_check.add_argument("history", type=Path)
+    policy_check.add_argument("policy", type=Path)
+    policy_check.add_argument("--json", action="store_true", dest="as_json")
+    policy_check.add_argument("--output", type=Path)
     return parser
 
 
@@ -216,6 +227,18 @@ def _emit_or_write(content: str, output: Path | None) -> None:
 def run(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.command == "policy-check":
+            decision = evaluate_reliability(
+                load_history(args.history),
+                load_policy(args.policy),
+            )
+            content = format_alert_decision(
+                decision,
+                as_json=args.as_json,
+            )
+            _emit_or_write(content, args.output)
+            return 1 if decision.alert else 0
+
         if args.command == "policy-validate":
             policy = load_policy(args.policy)
             print(_policy_validation_report(policy, as_json=args.as_json))
