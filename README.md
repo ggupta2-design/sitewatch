@@ -19,6 +19,8 @@ SiteWatch provides safe monitoring fundamentals:
 - create immutable, bounded availability histories without URLs or bodies;
 - summarize reliability goals and latency across recorded health samples;
 - reconstruct observed incident timelines, recoveries, and monitoring gaps;
+- validate reusable reliability policies without network access;
+- produce notification-ready aggregate alert decisions from saved history;
 - produce deterministic text or JSON reports with optional URL redaction;
 - distinguish healthy, drifted, unhealthy, and invalid runs through exit codes;
 - require no account, API key, hosted service, or third-party dependency.
@@ -43,6 +45,8 @@ sitewatch links https://example.com/ --max-links 25 --redact-urls
 sitewatch history-create examples/targets.json --output history-001.json
 sitewatch availability history-001.json --minimum-availability 99
 sitewatch incidents history-001.json --maximum-gap-seconds 900
+sitewatch policy-validate examples/reliability-policy.json
+sitewatch policy-check history-001.json examples/reliability-policy.json --json
 ```
 
 Configuration and baseline validation never make network requests. Health checks
@@ -57,10 +61,11 @@ See the [usage guide](docs/usage.md),
 [baseline guide](docs/baselines.md),
 [link-audit guide](docs/link-audits.md),
 [availability-history guide](docs/history.md),
-[incident-analysis guide](docs/incidents.md), and
+[incident-analysis guide](docs/incidents.md),
+[reliability-policy guide](docs/reliability-policies.md), and
 [privacy and safety guide](docs/privacy-and-safety.md) before monitoring
 untrusted targets or sharing reports.
 
 ## Status
 
-SiteWatch 0.5.0 adds read-only incident timelines, recovery insights, and monitoring-gap detection.
+SiteWatch 0.6.0 adds strict reliability policies and privacy-safe, notification-ready decisions.
