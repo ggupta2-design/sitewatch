@@ -112,5 +112,20 @@ Monitoring gaps identify insufficient observation density; they do not imply
 either uptime or downtime. SiteWatch does not infer continuous service state
 between samples, notify responders, or modify the source history.
 
+## Reliability-policy privacy
+
+Policy validation and history evaluation are local and make no network
+requests. Decision reports omit target names, URLs, timestamps, HTTP statuses,
+error-code values, durations, fingerprints, content types, response sizes,
+findings, and bodies. They retain the policy name, aggregate sample and target
+counts, finding codes, and observed-versus-limit values. Policy names and
+aggregate incident patterns can still disclose operational expectations, so
+review both policies and reports before sharing them.
+
+SiteWatch creates notification-ready decisions but does not deliver
+notifications or verify recipients. A clear decision describes only the supplied
+bounded history under the selected thresholds. It is not evidence of continuous
+uptime, future health, or a contractual service level.
+
 SiteWatch does not encrypt, upload, notify, schedule itself, or verify report
 recipients.
