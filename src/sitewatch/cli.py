@@ -39,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="sitewatch",
         description="Run safe, bounded website health checks",
     )
-    parser.add_argument("--version", action="version", version="sitewatch 0.5.0")
+    parser.add_argument("--version", action="version", version="sitewatch 0.6.0")
     commands = parser.add_subparsers(dest="command", required=True)
 
     validate = commands.add_parser(
