@@ -21,3 +21,7 @@ sitewatch-history*.json
 reports/
 sitewatch-output.*
 sitewatch-changes.*
+sitewatch-policy*.json
+policies/
+sitewatch-decision*.json
+decisions/
