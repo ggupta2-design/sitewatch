@@ -56,6 +56,16 @@ from .links import (
 )
 from .models import CheckResult, CheckState, Observation, Target
 from .output import write_output
+from .reliability import AlertDecision, ReliabilityCheck, evaluate_reliability
+from .reliability_policy import (
+    MAXIMUM_POLICY_COUNT,
+    ReliabilityPolicy,
+    format_policy,
+    load_policy,
+    policy_from_dict,
+    policy_to_dict,
+)
+from .reliability_report import alert_decision_to_dict, format_alert_decision
 from .report import check_run_to_dict, format_check_run
 from .safety import (
     SiteWatchError,
@@ -63,9 +73,10 @@ from .safety import (
     validate_public_resolution,
 )
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = [
+    "AlertDecision",
     "AvailabilityHistory",
     "AvailabilitySummary",
     "Baseline",
@@ -86,12 +97,16 @@ __all__ = [
     "LinkResult",
     "LinkState",
     "MAXIMUM_GAP_SECONDS",
+    "MAXIMUM_POLICY_COUNT",
     "MAX_HISTORY_SAMPLES",
     "MonitoringGap",
     "Observation",
+    "ReliabilityCheck",
+    "ReliabilityPolicy",
     "SiteWatchError",
     "TargetAvailability",
     "Target",
+    "alert_decision_to_dict",
     "analyze_incidents",
     "append_history",
     "availability_summary_to_dict",
@@ -106,6 +121,7 @@ __all__ = [
     "discover_links",
     "drift_run_to_dict",
     "evaluate_observation",
+    "evaluate_reliability",
     "fetch_html_page",
     "format_availability_summary",
     "format_baseline",
@@ -114,6 +130,8 @@ __all__ = [
     "format_link_audit",
     "format_history",
     "format_incident_analysis",
+    "format_alert_decision",
+    "format_policy",
     "history_from_dict",
     "history_from_run",
     "history_to_dict",
@@ -122,7 +140,10 @@ __all__ = [
     "load_baseline",
     "load_config",
     "load_history",
+    "load_policy",
     "observe_target",
+    "policy_from_dict",
+    "policy_to_dict",
     "run_checks",
     "summarize_availability",
     "target_from_dict",
